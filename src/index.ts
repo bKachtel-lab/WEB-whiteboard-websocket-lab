@@ -1,6 +1,5 @@
 import './index.css';
 import nameGenerator from './name-generator';
-import isDef from './is-def';
 
 // Définition de la fonction pour récupérer un cookie par son nom
 function getCookie(name: string): string | null {
@@ -11,10 +10,10 @@ function getCookie(name: string): string | null {
 
 // Vérification et récupération du nom depuis le cookie
 let wsname: string | null = getCookie('wsname');
-if (!isDef(wsname)) {
+if (!wsname) {
   // Si le nom n'est pas défini, générer un nouveau nom
   wsname = nameGenerator();
-  document.cookie = "wsname=" + encodeURIComponent(wsname);
+    document.cookie = "wsname=" + encodeURIComponent(wsname);
 }
 
 // Affichage du nom dans l'en-tête
