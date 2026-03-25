@@ -47,6 +47,14 @@ ws.onmessage = (event: MessageEvent) => {
   if(data.type === 'draw'){
     draw(data);
   }
+
+  //Historique envoyé au début
+  if(data.type === 'history'){
+    //On rajoute chaque action
+    data.data.forEach((action : any) => {
+      draw(action);
+    });
+  }
 };
 
 // Fonction pour envoyer un message via WebSocket lorsque l'utilisateur soumet le formulaire

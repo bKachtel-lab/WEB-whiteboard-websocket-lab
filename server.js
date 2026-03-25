@@ -40,10 +40,10 @@ wss.on('connection', function(client, request) {
 
     if(data.type === 'draw'){
       //Sauvegarder dans l'historique
-      history.push();
+      history.push(data);
 
       //Broadcast à tous les clients
-      this.clients.forEach(c => {
+      clients.forEach(c => {
         if(c.readyState === 1) c.send(JSON.stringify(data));
       });
     }
