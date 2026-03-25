@@ -1,8 +1,14 @@
 import http from 'http';
+import { stringify } from 'querystring';
 import { WebSocketServer } from 'ws';
 
 const port = 1235;
 const host = '0.0.0.0';
+
+//Tableau contenant tout l'historique des dessins
+const history = [];
+// Ensemble pour garder la liste de tous les clients connectés
+const clients = new Set();
 
 // Create a new HTTP server to deal with low-level connection details (TCP connections, sockets, HTTP handshakes, etc.)
 const server = http.createServer();
@@ -22,35 +28,30 @@ wss.broadcast = function broadcast(message) {
 
 // Register a listener for new connections on the WebSocket
 wss.on('connection', function(client, request) {
+  //Ajouter ce client à la liste
+  clients.add(client);
 
-  // Retrieve the name in the cookies
-  const cookies = request.headers.cookie ? request.headers.cookie.split(';') : [];
-  let wsname = cookies.find((c) => c.match(/^\s*wsname/));
+  //Envoyer l'historique au nouveau client
+  history.forEach(item => client.send(JSON.stringify(item)));
+
+  //Écouter les messages de ce client
+  client.on('message', (message) => {
+    const data = JSON.parse(message.toString());
+
+    if(data.type === 'draw'){
+      //Sauvegarder dans l'historique
+      history.push();
+
+      //Broadcast à tous les clients
+      this.clients.forEach(c => {
+        if(c.readyState === 1) c.send(JSON.stringify(data));
+      });
+    }
+  });
+
+   // Supprimer le client lorsqu'il se déconnecte
+  client.on('close', () => clients.delete(client));
   
-  if (wsname) {
-    wsname = wsname.split('=')[1];
-    console.log("First connection from", wsname);
-
-    // Greet the newly connected user
-    client.send('Welcome, ' + decodeURIComponent(wsname) + '!');
-
-    // Register a listener on each message of each connection
-    client.on('message', function(message) {
-       let data;
-       try{
-        data = JSON.parse(message.toString());
-       }catch (err){
-        //Si ce n'est pas JSON, ON IGNORE
-        console.log("Received non-JSON message (chat?):", message.toString());
-        return;
-       }
-
-       //Uniquement les message de dessin
-       if(data.type === 'draw'){
-        wss.broadcast(JSON.stringify(data));
-       }
-    });
-  }
 });
 
 // HTTP server starts listening on the given host and port
