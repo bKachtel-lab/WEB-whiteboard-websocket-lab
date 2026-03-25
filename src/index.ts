@@ -79,10 +79,16 @@ canvas.addEventListener('mouseup', () => {
 canvas.addEventListener('mousemove', (e) => {
   //Si on dessine pas -> rien
   if(!drawing) return;
-  //Si on dessine
-  //couleur du pinceau
-  ctx.fillStyle = 'black';
-  //Dessine un petit carré
-  ctx.fillRect(e.offsetX, e.offsetY, 2, 2);
+   
+  //objet représentant l'action de dessin
+  const data = {
+    type: 'draw', // type de message
+    x: e.offsetX, //position X
+    y: e.offsetY, //position Y
+    color: 'black' //couleur
+  };
+
+  //Envoi au serveur via WebSocket
+  ws.send(JSON.stringify(data));
 } );
 
