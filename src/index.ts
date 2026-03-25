@@ -30,7 +30,7 @@ if (headerParagraph) {
 }
 
 // Connexion WebSocket au serveur
-const ws = new WebSocket("ws://localhost:1234");
+const ws = new WebSocket("ws://localhost:1235");
 
 // Notification à l'ouverture de la connexion WebSocket
 ws.onopen = (event: Event) => {
@@ -40,9 +40,13 @@ ws.onopen = (event: Event) => {
 // Écouter les messages du serveur et les afficher dans la liste
 const messages = document.querySelector('#messages') as HTMLUListElement;
 ws.onmessage = (event: MessageEvent) => {
-  const line = document.createElement('li');
-  line.textContent = event.data;
-  messages.appendChild(line);
+  //Conversion du message JSON
+  const data = JSON.parse(event.data);
+
+  //Si c'est un dessin
+  if(data.type === 'draw'){
+    draw(data);
+  }
 };
 
 // Fonction pour envoyer un message via WebSocket lorsque l'utilisateur soumet le formulaire
@@ -91,4 +95,13 @@ canvas.addEventListener('mousemove', (e) => {
   //Envoi au serveur via WebSocket
   ws.send(JSON.stringify(data));
 } );
+
+// fonction pour dessiner
+function draw(data: any) {
+  ctx.fillStyle = data.color;
+
+  //Dessiner un pixel à la position recu
+  ctx.fillRect(data.x, data.y, 2,2);
+
+}
 

@@ -1,7 +1,7 @@
 import http from 'http';
 import { WebSocketServer } from 'ws';
 
-const port = 1234;
+const port = 1235;
 const host = '0.0.0.0';
 
 // Create a new HTTP server to deal with low-level connection details (TCP connections, sockets, HTTP handshakes, etc.)
@@ -36,11 +36,19 @@ wss.on('connection', function(client, request) {
 
     // Register a listener on each message of each connection
     client.on('message', function(message) {
-      const cli = '[' + decodeURIComponent(wsname) + '] ';
-      console.log("Message from", cli);
-      
-      // When receiving a message, broadcast it to all the connected clients
-      wss.broadcast(cli + message);
+       let data;
+       try{
+        data = JSON.parse(message.toString());
+       }catch (err){
+        //Si ce n'est pas JSON, ON IGNORE
+        console.log("Received non-JSON message (chat?):", message.toString());
+        return;
+       }
+
+       //Uniquement les message de dessin
+       if(data.type === 'draw'){
+        wss.broadcast(JSON.stringify(data));
+       }
     });
   }
 });
