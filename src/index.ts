@@ -1,6 +1,13 @@
 import './index.css';
 import nameGenerator from './name-generator';
 
+//Récupération du canvas dans le DOM
+const canvas = document.getElementById('board') as HTMLCanvasElement;
+//Récupération du contexte 2D pour dessiner
+const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
+//Variable pour davoir si on est entrain de dessiner
+let drawing = false;
+
 // Définition de la fonction pour récupérer un cookie par son nom
 function getCookie(name: string): string | null {
   const cookies = document.cookie.split(';');
@@ -57,3 +64,25 @@ if (sendForm) {
   sendForm.addEventListener('submit', sendMessage, true);
   sendForm.addEventListener('blur', sendMessage, true);
 }
+
+//Quand on clique -> on commence à dessiner
+canvas.addEventListener('mousedown', () => {
+  drawing = true;
+});
+
+//Quand on relache -> on arrete
+canvas.addEventListener('mouseup', () => {
+  drawing = false;
+});
+
+//Quand la souris bouge
+canvas.addEventListener('mousemove', (e) => {
+  //Si on dessine pas -> rien
+  if(!drawing) return;
+  //Si on dessine
+  //couleur du pinceau
+  ctx.fillStyle = 'black';
+  //Dessine un petit carré
+  ctx.fillRect(e.offsetX, e.offsetY, 2, 2);
+} );
+
